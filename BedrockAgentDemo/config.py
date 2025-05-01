@@ -13,7 +13,7 @@ class Config:
     # Server configuration
     server_script_path: str = os.environ.get(
         "MCP_SERVER_PATH", 
-        "D:\\AIAgentAWSBedrockDemo\\electricity-service\\main.py"
+        "****add mcp server your path here****"
     )
     
     # AWS configuration
@@ -22,7 +22,7 @@ class Config:
     # Model configuration
     model_id: str = os.environ.get(
         "BEDROCK_MODEL_ID", 
-        "us.meta.llama3-2-90b-instruct-v1:0"
+        "***model id of bedrock***"
     )
     max_tokens: int = int(os.environ.get("MAX_TOKENS", "1000"))
     temperature: float = float(os.environ.get("TEMPERATURE", "0"))
