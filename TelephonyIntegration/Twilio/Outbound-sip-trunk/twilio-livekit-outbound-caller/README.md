@@ -68,7 +68,7 @@ python agent.py download-files
 1. Copy and rename `outbound-trunk-example.json` to `outbound-trunk.json`, then update it with your SIP credentials.
 
 ```bash
-cp outbound-trunk-example.json `outbound-trunk.json
+cp outbound-trunk-example.json outbound-trunk.json
 ```
 
    **Field Descriptions:**
@@ -101,9 +101,8 @@ lk sip outbound create outbound-trunk.json
 ```
 
 If you're not using a global Livekit CLI config, provide your credentials inline:
-- Generate your API keys here:
-👉 https://docs.livekit.io/home/cloud/keys-and-tokens/
-- Then run:
+- Generate your API keys: [livekit](https://docs.livekit.io/home/cloud/keys-and-tokens/) 
+- Then add keys and run:
 ```bash
 lk --api-key <api-key> --api-secret <api-secret> --url <url> sip outbound create outbound-trunk.json
 ```
@@ -126,8 +125,8 @@ Update the following in `.env.local`:
 - `LIVEKIT_API_KEY`
 - `LIVEKIT_API_SECRET`
 - `OPENAI_API_KEY`
-- `DEEPGRAM_API_KEY` *(Optional) only needed when using pipelined models (Fetch from https://console.deepgram.com)*
-- `CARTESIA_API_KEY` *(Optional) only needed when using pipelined models (Fetch from https://play.cartesia.ai/keys)*
+- `DEEPGRAM_API_KEY` *(Optional) only needed when using pipelined models (Fetch from [Deepgram](https://console.deepgram.com) )*
+- `CARTESIA_API_KEY` *(Optional) only needed when using pipelined models (Fetch from [Cartesia](https://play.cartesia.ai/keys) )*
 - `SIP_OUTBOUND_TRUNK_ID` *(Returned from trunk creation)*
 
 ---
@@ -155,8 +154,7 @@ lk dispatch create \
   --metadata '{"phone_number": "+1234567890", "transfer_to": "+9876543210"}'
 ```
 
-If you're not using a global Livekit CLI config:
-https://docs.livekit.io/home/cloud/keys-and-tokens/
+If you're not using a global Livekit CLI config: [livekit](https://docs.livekit.io/home/cloud/keys-and-tokens/)
 
 ```bash
 lk --api-key <api-key> --api-secret <api-secret> --url <url> \
