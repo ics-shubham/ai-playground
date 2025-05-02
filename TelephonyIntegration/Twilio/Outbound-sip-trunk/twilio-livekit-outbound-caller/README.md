@@ -20,7 +20,7 @@ Run the following commands:
 # Clone the repository:
 git clone https://github.com/ICubeSystems/ai-playground.git
 # Change directory to `twilio-livekit-outbound-caller`:
-cd TelephonyIntegration/Twilio/Outbound-sip-trunk/twilio-livekit-outbound-caller/twilio-livekit-outbound-caller
+cd ai-playground/TelephonyIntegration/Twilio/Outbound-sip-trunk/twilio-livekit-outbound-caller
 ```
 
 (Optional) Create and activate a virtual environment:
