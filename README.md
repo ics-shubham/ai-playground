@@ -29,3 +29,9 @@ End-to-end examples for connecting AI-powered voice agents with Telephony provid
    ```bash
    git clone https://github.com/ICubeSystems/ai-playground.git
    cd ai-playground
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
