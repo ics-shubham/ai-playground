@@ -20,7 +20,7 @@ The application can be configured using the following environment variables in .
 
 ### Running the Client
 
-Make sure the mcp server in Demo-mcp_servers
+Make sure the mcp server "electricity-service" in Demo-mcp_servers is running before running the main.py
 
 ```bash
 # Run directly
