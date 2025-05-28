@@ -2,7 +2,7 @@
 
 import sys
 import click
-from electricity_service.server.outage_server import create_server, run_server
+from electricity_service.server.server import create_server, run_server
 
 @click.command()
 @click.option("--port", default=8000, help="Port value (unused for stdio transport)")

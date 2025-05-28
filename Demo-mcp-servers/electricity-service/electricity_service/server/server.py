@@ -2,7 +2,6 @@
 
 import anyio
 import logging
-from typing import Optional
 import mcp.types as types
 from mcp.server.lowlevel import Server
 

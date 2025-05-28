@@ -1,6 +1,5 @@
 """Validation utilities for electricity service."""
 
-import re
 from typing import Pattern, Dict, Any, Tuple, Optional
 
 # This can be extended with more validation functions as needed

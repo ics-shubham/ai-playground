@@ -1,7 +1,6 @@
 """Service functions for handling billing information."""
 
 import logging
-from datetime import datetime
 
 from electricity_service.data.billing_data import (
     validate_meter_number,

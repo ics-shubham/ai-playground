@@ -1,7 +1,6 @@
 """Service functions for handling outage information."""
 
 import logging
-from typing import Dict, Any
 
 from electricity_service.data.outage_data import find_outage_by_area, get_valid_areas
 from electricity_service.utils.formatters import format_datetime

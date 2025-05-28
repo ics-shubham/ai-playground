@@ -1,7 +1,7 @@
 """Data and utilities for billing information."""
 
 import re
-from typing import Dict, Any, Optional, Pattern
+from typing import Dict, Optional, Pattern
 
 # Valid meter number pattern
 METER_PATTERN: Pattern = re.compile(r"^UP\d{10}$", re.IGNORECASE)

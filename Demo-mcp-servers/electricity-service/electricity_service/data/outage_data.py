@@ -1,6 +1,6 @@
 """Data and utilities for outage information."""
 
-from typing import Dict, Any, Optional
+from typing import Dict, Optional
 
 # More realistic outage database
 OUTAGE_DATABASE: Dict[str, Dict[str, str]] = {

@@ -1,33 +1,26 @@
-# Electricity Service
+# Electricity Service MCP Server
 
 A modular service for checking electricity outage status and billing information.
 
 ## Features
 
-- Check electricity outage status by area/locality
-- Check billing information by meter number
-- Flexible and modular architecture
-- Well-documented API
-
-## Usage
+- Check electricity outage status by location
+- Check billing information by meter_number
 
 ### Running the service
 
 ```bash
-# Run the service with default settings
-electricity-service serve
-
-# Run with custom logging level
-electricity-service serve --log-level DEBUG
+# Run directly
+python -m main.py
 ```
 
 ### Development
 
 The project follows a modular architecture:
-
+    
 - `server/`: Contains the MCP server implementation
 - `services/`: Business logic for outage and billing services
-- `data/`: Data storage and access functions
+- `data/`: Data storage and access functions 
 - `utils/`: Shared utility functions
 
 ## Configuration
