@@ -562,9 +562,6 @@ class VoiceAILearningAssistant:
             self.quiz_active = False
             self.provide_session_summary()
 
-    #     try:
-    #         # response = self.request_parser_chain.run(user_request=user_input)
-    #         response = self.request_parser_chain.invoke({"user_request": user_input})
     def parse_json_from_response(self, response: str) -> Dict:
         """Extract and parse JSON from LLM response"""
         try:
