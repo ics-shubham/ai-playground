@@ -130,11 +130,12 @@ class VoiceAILearningAssistant:
             raise
 
     def setup_langchain_chains(self):
-        """Setup advanced LangChain chains with memory and complex parsing"""
+        """Setup advanced LangChain chains with PromptTemplate.from_template"""
 
         # 1. Quiz Request Parser Chain
-        request_parser_template = PromptTemplate.from_template(
-            """
+        self.request_parser_chain = (
+            PromptTemplate.from_template(
+                """
         You are a quiz request interpreter. Your job is to read a student's quiz request and extract structured data from it.
 
         The student may ask for:
@@ -161,15 +162,15 @@ class VoiceAILearningAssistant:
 
         User Request: "{user_request}"
         """
-        )
-
-        self.request_parser_chain = (
-            request_parser_template | self.llm | JsonOutputParser()
+            )
+            | self.llm
+            | JsonOutputParser()
         )
 
         # 2. SQL Query Generator Chain
-        query_generator_template = PromptTemplate.from_template(
-            """
+        self.query_generator_chain = (
+            PromptTemplate.from_template(
+                """
         You are a PostgreSQL query generator for a quiz system. Generate a query to fetch ONE question.
 
         Database Schema:
@@ -201,17 +202,14 @@ class VoiceAILearningAssistant:
             "filters_applied": {{"subject_name": "..."}}
         }}
         """
-        )
-
-        # self.query_generator_prompt = PromptTemplate(input_variables=["quiz_request", "asked_questions"], template=query_generator_template)
-        # self.query_generator_chain = LLMChain(llm=self.llm, prompt=self.query_generator_prompt, output_key="query_data")
-
-        self.query_generator_chain = (
-            query_generator_template | self.llm
-        )  # | StringOutputParser()
+            )
+            | self.llm
+        )  # | JsonOutputParser()
 
         # 3. Question Presenter Chain
-        question_presenter_template = """
+        self.question_presenter_chain = (
+            PromptTemplate.from_template(
+                """
         You are a friendly quiz host. Present the question in an engaging way.
 
         Question Data: {question_data}
@@ -223,20 +221,15 @@ class VoiceAILearningAssistant:
         Example format:
         "Alright! Here's question number {session_question_number}. [Engaging introduction]. {question}"
         """
-
-        self.question_presenter_prompt = PromptTemplate(
-            input_variables=["question_data", "session_question_number", "question"],
-            template=question_presenter_template,
-        )
-
-        self.question_presenter_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.question_presenter_prompt,
-            output_key="presented_question",
+            )
+            | self.llm
+            | StrOutputParser()
         )
 
         # 4. Answer Evaluation Chain
-        evaluation_template = """
+        self.evaluation_chain = (
+            PromptTemplate.from_template(
+                """
         You are an expert tutor evaluating a student's answer. Be fair, encouraging, and educational.
 
         Question: {question}
@@ -260,18 +253,15 @@ class VoiceAILearningAssistant:
             "encouragement": "Motivational message"
         }}
         """
-
-        self.evaluation_prompt = PromptTemplate(
-            input_variables=["question", "correct_answer", "student_answer"],
-            template=evaluation_template,
-        )
-
-        self.evaluation_chain = LLMChain(
-            llm=self.llm, prompt=self.evaluation_prompt, output_key="evaluation"
+            )
+            | self.llm
+            | JsonOutputParser()
         )
 
         # 5. Session Summary Chain
-        summary_template = """
+        self.summary_chain = (
+            PromptTemplate.from_template(
+                """
         You are creating a session summary for a quiz. Be encouraging and highlight progress.
 
         Session Stats: {session_stats}
@@ -286,14 +276,9 @@ class VoiceAILearningAssistant:
 
         Keep it positive and educational.
         """
-
-        self.summary_prompt = PromptTemplate(
-            input_variables=["session_stats", "total_questions", "correct_answers"],
-            template=summary_template,
-        )
-
-        self.summary_chain = LLMChain(
-            llm=self.llm, prompt=self.summary_prompt, output_key="session_summary"
+            )
+            | self.llm
+            | StrOutputParser()
         )
 
         # 6. Sequential Chain for Complete Quiz Flow
@@ -320,7 +305,7 @@ class VoiceAILearningAssistant:
         # Greeting message (extract from llm)
         greeting = """
         Welcome! I'm your study buddy, here to help you learn and practice.
-        Whenever you feel ready, just say 'start', and I’ll take it from there!
+        Whenever you feel ready, just say 'start', and I'll take it from there!
         """
 
         # I'll ask you questions one at a time, and you can say 'next question' to continue
@@ -472,17 +457,11 @@ class VoiceAILearningAssistant:
             }
 
             # Parse initial request
-            # self.quiz_request = self.parse_quiz_request(initial_request)
             self.quiz_request = self.request_parser_chain.invoke(
                 {"user_request": initial_request}
             )
 
-            # {"question_count": 5, "category": None, "difficulty": None, "topic": None, "quiz_type": "general"}
-            #
-            # "question_count": <int>, "subject_name": "<subject or null>"
-
             self.speak_text(
-                # Great! Starting your quiz. I'll ask you {self.quiz_request['question_count']} questions one at a time.
                 f"""
                     Great! Let's begin your quiz session. I will ask you one question at a time. 
                     After each question, you can answer, and when you're ready, just say 'next question' to continue. 
@@ -583,24 +562,9 @@ class VoiceAILearningAssistant:
             self.quiz_active = False
             self.provide_session_summary()
 
-    # def parse_quiz_request(self, user_input: str) -> Dict:
-    #     """Parse user's quiz request using LangChain"""
     #     try:
     #         # response = self.request_parser_chain.run(user_request=user_input)
     #         response = self.request_parser_chain.invoke({"user_request": user_input})
-    #         parsed_data = self.parse_json_from_response(response)
-
-    #         if parsed_data:
-    #             logger.info(f"✅ Parsed request: {parsed_data}")
-    #             return parsed_data
-
-    #         # Fallback parsing
-    #         return {"question_count": 5, "category": None, "difficulty": None, "topic": None, "quiz_type": "general"}
-
-    #     except Exception as e:
-    #         logger.error(f"❌ Request parsing error: {e}")
-    #         return {"question_count": 5, "category": None, "difficulty": None, "topic": None, "quiz_type": "general"}
-
     def parse_json_from_response(self, response: str) -> Dict:
         """Extract and parse JSON from LLM response"""
         try:
@@ -626,14 +590,23 @@ class VoiceAILearningAssistant:
                 else "0"
             )
 
-            # response = self.query_generator_chain.run(quiz_request=str(quiz_request), asked_questions=asked_questions_str)
-            # response = self.query_generator_chain.invoke({"quiz_request": str(quiz_request), "asked_questions": asked_questions_str})
+            response = self.query_generator_chain.invoke(
+                {
+                    "quiz_request": str(quiz_request),
+                    "asked_questions": asked_questions_str,
+                }
+            )
 
-            # query_data = self.parse_json_from_response(response)
-
-            # if query_data and 'sql_query' in query_data:
-            #     logger.info(f"✅ Generated query: {query_data['sql_query']}")
-            #     return query_data
+            # Since we're using JsonOutputParser, response should already be a dict
+            if isinstance(response, dict) and "sql_query" in response:
+                logger.info(f"✅ Generated query: {response['sql_query']}")
+                return response
+            elif isinstance(response, str):
+                # Fallback to parse JSON from string response
+                query_data = self.parse_json_from_response(response)
+                if query_data and "sql_query" in query_data:
+                    logger.info(f"✅ Generated query: {query_data['sql_query']}")
+                    return query_data
 
             # Fallback query
             return {
@@ -650,7 +623,7 @@ class VoiceAILearningAssistant:
                 else "0"
             )
             return {
-                "sql_query": f"SELECT id, question_number, question, answer, category FROM qa_pairs WHERE id NOT IN ({asked_questions_str}) ORDER BY RANDOM() LIMIT 1",
+                "sql_query": f"SELECT id, question_number, question, answer, subject_name FROM qa_pairs WHERE id NOT IN ({asked_questions_str}) ORDER BY RANDOM() LIMIT 1",
                 "description": "Random question (error fallback)",
                 "filters_applied": {},
             }
@@ -684,12 +657,16 @@ class VoiceAILearningAssistant:
     ) -> str:
         """Present question using LangChain"""
         try:
-            response = self.question_presenter_chain.run(
-                question_data=str(question_data),
-                session_question_number=session_question_number,
-                question=question_data["question"],
+            response = self.question_presenter_chain.invoke(
+                {
+                    "question_data": str(question_data),
+                    "session_question_number": session_question_number,
+                    "question": question_data["question"],
+                }
             )
-            return response.strip()
+            return (
+                response.strip() if isinstance(response, str) else str(response).strip()
+            )
         except Exception as e:
             logger.error(f"❌ Question presentation error: {e}")
             return f"Question {session_question_number}: {question_data['question']}"
@@ -699,21 +676,33 @@ class VoiceAILearningAssistant:
     ) -> Dict:
         """Evaluate student's answer using LangChain"""
         try:
-            response = self.evaluation_chain.run(
-                question=question,
-                correct_answer=correct_answer,
-                student_answer=student_answer,
+            response = self.evaluation_chain.invoke(
+                {
+                    "question": question,
+                    "correct_answer": correct_answer,
+                    "student_answer": student_answer,
+                }
             )
 
-            evaluation_data = self.parse_json_from_response(response)
-
-            if evaluation_data and all(
-                key in evaluation_data for key in ["is_correct", "feedback", "score"]
+            # Since we're using JsonOutputParser, response should already be a dict
+            if isinstance(response, dict) and all(
+                key in response for key in ["is_correct", "feedback", "score"]
             ):
                 logger.info(
-                    f"✅ Evaluation: {'Correct' if evaluation_data['is_correct'] else 'Incorrect'}"
+                    f"✅ Evaluation: {'Correct' if response['is_correct'] else 'Incorrect'}"
                 )
-                return evaluation_data
+                return response
+            elif isinstance(response, str):
+                # Fallback to parse JSON from string response
+                evaluation_data = self.parse_json_from_response(response)
+                if evaluation_data and all(
+                    key in evaluation_data
+                    for key in ["is_correct", "feedback", "score"]
+                ):
+                    logger.info(
+                        f"✅ Evaluation: {'Correct' if evaluation_data['is_correct'] else 'Incorrect'}"
+                    )
+                    return evaluation_data
 
             # Fallback evaluation
             is_correct = (
@@ -779,10 +768,12 @@ class VoiceAILearningAssistant:
                 ) * 100
 
                 # Generate summary using LangChain
-                summary_response = self.summary_chain.run(
-                    session_stats=str(self.session_stats),
-                    total_questions=self.session_stats["total_questions"],
-                    correct_answers=self.session_stats["correct_answers"],
+                summary_response = self.summary_chain.invoke(
+                    {
+                        "session_stats": str(self.session_stats),
+                        "total_questions": self.session_stats["total_questions"],
+                        "correct_answers": self.session_stats["correct_answers"],
+                    }
                 )
 
                 final_summary = (
